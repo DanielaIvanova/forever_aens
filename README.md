@@ -52,3 +52,8 @@ config :forever_aens, :client,
   gas_price: 1_000_000_000,
   auth: []
 ```
+6. Now you are ready to start the application:
+``` elixir
+ForeverAens.start_link
+```
+**NOTE:** The application will automatically check name status and take actions each 40 seconds.
