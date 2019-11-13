@@ -4,13 +4,11 @@ defmodule ForeverAens do
   """
   alias AeppSDK.{Account, AENS, Chain, Client, Middleware}
   alias AeppSDK.Utils.Keys
+
   use GenServer
   require Logger
 
-  # The height, relative to current, when we start bidding
-  @starting_height_bidding 10
-
-  def start_link() do
+  def start_link(_arg) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
@@ -30,8 +28,10 @@ defmodule ForeverAens do
   end
 
   def handle_info({:work, state}, _state) do
-    new_state = extend_name(state)
-    schedule_work(new_state)
+    state
+    |> extend_name()
+    |> schedule_work()
+
     {:noreply, state}
   end
 
@@ -83,7 +83,7 @@ defmodule ForeverAens do
         winning_bidder: winning_bidder,
         expiration: expiration
       } ->
-        if height <= expiration - @starting_height_bidding do
+        if height <= expiration - Application.get_env(:forever_aens, :prolong_before) do
           {:ok, %{balance: current_balance}} = Account.get(client, public)
           increment = Application.get_env(:forever_aens, :increment, 1.05)
           new_bid = round(String.to_integer(winning_bid) * increment)
@@ -95,15 +95,9 @@ defmodule ForeverAens do
 
             state
           else
-            case AENS.claim(client, name, 0, name_fee: new_bid) do
-              {:ok, _tx} ->
-                Logger.info("Successfully placed our new bid: #{inspect(new_bid)}")
-                state
-
-              {:error, reason} ->
-                Logger.error("#{inspect(reason)}")
-                state
-            end
+            {:ok, _tx} = AENS.claim(client, name, 0, name_fee: new_bid)
+            Logger.info("Successfully placed our new bid: #{inspect(new_bid)}")
+            state
           end
         else
           Logger.error(
@@ -116,7 +110,7 @@ defmodule ForeverAens do
   end
 
   defp schedule_work(state) do
-    Process.send_after(self(), {:work, state}, 5000)
+    Process.send_after(self(), {:work, state}, 40_000)
   end
 
   defp build_client() do

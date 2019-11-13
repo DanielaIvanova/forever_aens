@@ -3,7 +3,9 @@ import Config
 config :forever_aens,
   name: "cgx.chain",
   password: "123456",
-  # Ex. current height 100 , name's auction expiry height 109, start_height_bidding= 10 , so we start bidding because there are less than 9 blocks before expiry
+  # will try to prolong the name if the difference between current and expiry block is less or equal to this value
+  prolong_before: 10,
+  # Ex. current height 100 , name's auction expiry height 109, prolong_before= 10 , so we start bidding because there are less than 9 blocks before expiry
   # 5% of increasing of previous bid
   increment: 1.1
 
