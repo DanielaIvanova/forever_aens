@@ -21,7 +21,7 @@ defmodule ForeverAens.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:aepp_sdk_elixir, git: "https://github.com/aeternity/aepp-sdk-elixir.git", tag: "v0.5.0"}
+      {:aepp_sdk_elixir, git: "https://github.com/aeternity/aepp-sdk-elixir.git", tag: "v0.5.1"}
     ]
   end
 end

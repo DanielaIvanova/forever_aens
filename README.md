@@ -1,9 +1,9 @@
-# ForeverAens
+# ForeverAENS
 
 Automatic bidding for Aeternity names and auto-renewal.
 
 ## Description
-`Forever aens` is a small showcase prototype project, which is built in Elixir, by using [Aeternity Elixir SDK](https://github.com/aeternity/aepp-sdk-elixir). This application automates all the activities, needed to "hold" a name in [Aeternity blockchain](https://github.com/aeternity/aeternity), this app allows a user to:
+`ForeverAENS` is a small showcase prototype project, which is built in Elixir, by using [Aeternity Elixir SDK](https://github.com/aeternity/aepp-sdk-elixir). This application automates all the activities, needed to "hold" a name in [Aeternity blockchain](https://github.com/aeternity/aeternity), this app allows a user to:
 1. Preclaim and claim a given name(if the name wasn't found in the blockchain and there is no current auction for it).
 2. Prolonging given name before the expiry by user defined number blocks. 
 3. Monitor and automatically bid for a given name(if the name's auction is active and if the user has enough tokens for making a new bid).
@@ -56,4 +56,4 @@ config :forever_aens, :client,
 ``` elixir
 ForeverAens.start_link
 ```
-**NOTE:** The application will automatically check name status and take actions each 40 seconds.
+**NOTE:** The application will automatically check name status and take actions each **40 seconds**.
