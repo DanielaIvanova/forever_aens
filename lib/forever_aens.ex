@@ -50,7 +50,6 @@ defmodule ForeverAens do
         case Middleware.search_name(client, name) do
           {:ok, list} ->
             if Enum.any?(list, fn map -> map.name === name end) do
-              Logger.error(fn -> "Name is already taken, reinitializing state..." end)
               state
             else
               case claim_height do

@@ -56,4 +56,4 @@ config :forever_aens, :client,
 ``` elixir
 ForeverAens.start_link
 ```
-**NOTE:** The application will automatically check name status and take actions each **40 seconds**.
+**NOTE:** The application will automatically check name status and take actions each **5 seconds**.
