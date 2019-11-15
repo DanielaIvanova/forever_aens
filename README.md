@@ -41,8 +41,8 @@ config :forever_aens,
   password: "123456", # keystore password
   prolong_before: 10  # will try to prolong the name if the difference between current and expiry block is less or equal to this value 
   # Ex. current height 100 , name's auction expiry height 109, prolong_before = 10 , so we start bidding because there are less than 9 blocks before expiry
-  # 10% of increasing of previous bid
-  increment: 1.1 
+  # 5% of increasing of previous bid
+  increment: 1.05
 
 config :forever_aens, :client,
   key_store_path: "my_keystore",
