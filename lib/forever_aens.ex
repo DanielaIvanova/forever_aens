@@ -19,23 +19,28 @@ defmodule ForeverAens do
   def init(%{}) do
     client = build_client()
     name = Application.get_env(:forever_aens, :name)
-    schedule_work(%{client: client, name: name})
-    {:ok, %{client: client, name: name}}
+    schedule_work()
+    {:ok, %{client: client, name: name, claim_height: 0}}
   end
 
   def handle_call(:get_state, _from, state) do
     {:reply, state, state}
   end
 
-  def handle_info({:work, state}, _state) do
-    state
-    |> extend_name()
-    |> schedule_work()
+  def handle_info(:work, state) do
+    new_state = extend_name(state)
+    schedule_work()
 
-    {:noreply, state}
+    {:noreply, new_state}
   end
 
-  defp extend_name(%{client: %Client{keypair: %{public: public}} = client, name: name} = state)
+  defp extend_name(
+         %{
+           client: %Client{keypair: %{public: public}} = client,
+           name: name,
+           claim_height: claim_height
+         } = state
+       )
        when is_binary(name) do
     {:ok, height} = Chain.height(client)
     {:ok, active_auctions} = Middleware.get_active_name_auctions(client)
@@ -48,13 +53,32 @@ defmodule ForeverAens do
               Logger.error(fn -> "Name is already taken, reinitializing state..." end)
               state
             else
-              res = AENS.preclaim(client, name) |> AENS.claim()
+              case claim_height do
+                0 ->
+                  client
+                  |> AENS.preclaim(name)
+                  |> AENS.claim()
 
-              Logger.info(fn ->
-                "Name was not found, preclaimin' & claimin' it: #{inspect(res)}"
-              end)
+                  Logger.info(fn ->
+                    "Name was not found, preclaimin' & claimin' in progress...."
+                  end)
 
-              state
+                  %{state | claim_height: height}
+
+                _ when claim_height == height ->
+                  Logger.info(fn ->
+                    "Claiming is still in progress...."
+                  end)
+
+                  state
+
+                _ when claim_height < height ->
+                  Logger.info(fn ->
+                    "Name should be claimed now....Starting monitoring for name: #{inspect(name)}"
+                  end)
+
+                  state
+              end
             end
 
           {:error, rsn} ->
@@ -95,7 +119,7 @@ defmodule ForeverAens do
 
             state
           else
-            {:ok, _tx} = AENS.claim(client, name, 0, name_fee: new_bid)
+            AENS.claim(client, name, 0, name_fee: new_bid)
             Logger.info("Successfully placed our new bid: #{inspect(new_bid)}")
             state
           end
@@ -109,8 +133,8 @@ defmodule ForeverAens do
     end
   end
 
-  defp schedule_work(state) do
-    Process.send_after(self(), {:work, state}, 40_000)
+  defp schedule_work() do
+    Process.send_after(self(), :work, 5_000)
   end
 
   defp build_client() do

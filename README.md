@@ -37,7 +37,7 @@ AeppSDK.Utils.Keys.new_keystore(secret_key, "123456", name: "my_keystore")
 import Config
 
 config :forever_aens,
-  name: "cgx.chain",  # desired name
+  name: "daniela12345.chain",  # desired name
   password: "123456", # keystore password
   prolong_before: 10  # will try to prolong the name if the difference between current and expiry block is less or equal to this value 
   # Ex. current height 100 , name's auction expiry height 109, prolong_before = 10 , so we start bidding because there are less than 9 blocks before expiry
